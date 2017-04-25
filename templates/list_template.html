@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+ <html lang="en">
+ 
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta name="description" content="">
+     <meta name="author" content="">
+ 
+     <title>Test</title>
+
+
+     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+     
+     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
+     <!-- <script type="text/javascript" src="js/head.min.js"></script> -->
+     <script type="text/javascript" src="flask_shelve.js"></script>
+
+      <link rel="stylesheet" href="static/css/annodoc-main.css"/>
+      <link rel="stylesheet" href="static/css/style-vis.css"/> 
+
+ </head>
+ 
+ <body>
+   <table id="files">
+        <thead>
+            <tr>
+                <th>Total</th>
+                <th>TypeCnt</th>
+                <th>Types</th>
+                <th>Left</th>
+                <th>Right</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th>TypeCnt</th>
+                <th>Types</th>
+                <th>Left</th>
+                <th>Right</th>
+                <th>Link</th>
+            </tr>
+        </tfoot>
+        <tbody>
+	  {% for cols,link in files %}
+	  <tr>
+	    {% for c in cols %}
+	    <td>{{c}}</td>
+	    {% endfor %}
+	    <td><a href="{{link}}">[trees]</a></td>
+	  </tr>
+	  {% endfor %}
+	</tbody>
+   </table>
+
+   <script type="text/javascript">
+     $(document).ready(function() {
+    $('#files').DataTable({"order": [[ 0, "desc" ]], "paging":false});
+     } );
+   </script>
+ </body>
+
+ </html>

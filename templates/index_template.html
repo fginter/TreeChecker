@@ -7,46 +7,50 @@
      <meta name="description" content="">
      <meta name="author" content="">
  
-     <title>TurkuNLP dep_search</title>
+     <title>Test</title>
 
-     <script type="text/javascript">
-       $APP_ROOT= {{request.script_root|tojson|safe }};
-     </script>
- 
-     <!-- Bootstrap core CSS -->
-     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-     <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
-     <link href="{{ url_for('static', filename='css/turkunlp.css') }}" rel="stylesheet">
 
-     <!-- Custom styles for this template -->
-     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"> </script>
-     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"> </script>
-     <script src="{{ url_for('static', filename='js/dsearch.js') }}"> </script>
-     <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
-
+     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
      
-	<!-- annotation visualization stuff --> 
-	<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-redmond.css') }}"/> -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/annodoc-main.css') }}"/>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/style-vis.css') }}"/>
-	<!-- <link rel="stylesheet" href="http://bionlp-www.utu.fi/dep_search//css/depsearch.css"> -->
-	<script type="text/javascript" src="{{ url_for('static', filename='js/head.min.js') }}"></script>
-	<!-- end annotation visualization stuff -->
+     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
+     <!-- <script type="text/javascript" src="js/head.min.js"></script> -->
+     <script type="text/javascript" src="flask_shelve.js"></script>
+
+      <link rel="stylesheet" href="static/css/annodoc-main.css"/>
+      <link rel="stylesheet" href="static/css/style-vis.css"/> 
 
  </head>
  
  <body>
-   <div class="container">
-     <a href="http://bionlp.utu.fi/">[Turku NLP Group]</a>
-     
-     
-     <div id="treetable" class="row" >
-       {{ content }}
-     </div>
+   <h1 style="text-align: center" class="content-head ui-widget-header">{{ title }}</h1>
+   <br/><br/>
+   
+{% for dtype, treelist in trees %}
+<h2 style="text-align: center" class="content-head ui-widget-header">{{ dtype }}</h2>
+<div class="container">
+{% for tree,treeid in treelist %}
+<!-- <a data-target="#conllu_{{loop.index}}" data-toggle="collapse"> [conllu]</a>
+<div class="collapse" id="conllu_{{loop.index}}">
+<pre>
+{{tree}}
+</pre>
+</div> -->
+<div class="flask_shelve" fstype="multichoice" fschoices="CorrectHit|FalseHit|WrongSyntax" fscol="test4" fsid="{{treeid}}">
+<pre>
+<code class="conllu">
+{{tree}}
+</code>
+</pre>
+</div>
+{% endfor %}
+</div>
+{% endfor %}
 
-<!-- annotation visualization stuff --> 
+<!-- annotation visualization stuff -->
 <script type="text/javascript">
-    var root = "{{url_for('static' , filename='')}}";
+    var root = "static/";
     head.js(
         // External libraries
         root + 'js/jquery.min.js',
@@ -80,7 +84,7 @@
 
     head.ready(function() {
         // mark current collection (filled in by Jekyll)
-        Collections.listing['_current'] = ';'
+        //Collections.listing['_current'] = ';'
 
 	// performs all embedding and support functions
     console.log("Activating Annodoc");
@@ -90,5 +94,10 @@
 </script>
 <!-- end annotation visualization stuff -->
 
+<script type="text/javascript">
+  APP_ROOT="http://epsilon-it.utu.fi/flask_shelve";
+  $(".flask_shelve").each(flask_shelve);
+  initialize_values("test4");
+</script>
  </body>
  </html>
