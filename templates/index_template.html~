@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+ <html lang="en">
+ 
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta name="description" content="">
+     <meta name="author" content="">
+ 
+     <title>TurkuNLP dep_search</title>
+
+     <script type="text/javascript">
+       $APP_ROOT= {{request.script_root|tojson|safe }};
+     </script>
+ 
+     <!-- Bootstrap core CSS -->
+     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+     <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
+     <link href="{{ url_for('static', filename='css/turkunlp.css') }}" rel="stylesheet">
+
+     <!-- Custom styles for this template -->
+     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/dsearch.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+
+     
+	<!-- annotation visualization stuff --> 
+	<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-redmond.css') }}"/> -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/annodoc-main.css') }}"/>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style-vis.css') }}"/>
+	<!-- <link rel="stylesheet" href="http://bionlp-www.utu.fi/dep_search//css/depsearch.css"> -->
+	<script type="text/javascript" src="{{ url_for('static', filename='js/head.min.js') }}"></script>
+	<!-- end annotation visualization stuff -->
+
+ </head>
+ 
+ <body>
+   <div class="container">
+     <a href="http://bionlp.utu.fi/">[Turku NLP Group]</a>
+     <form class="form-inline" id="inpform" role="form">
+       <div class="form-group">
+
+
+	 
+	 <select class="form-control" id="treeset" name="treeset">
+	   {% for cgroup in corpus_groups %}
+	   <optgroup label="{{cgroup.name}}">
+	   {% for cid, cname in cgroup.corpora %}
+	   <option value="{{cid}}">{{cname}}</option>
+	   {% endfor %}
+	   </optgroup>
+	   {% endfor %}
+	 </select>
+       </div>
+       <input type="text" class="form-control autocomplete" id="query" name="query" placeholder="Type in your query" autocorrect="off" autocapitalize="none"/>
+	 <button id="submitquery" type="submit" class="btn btn-default btn-primary active form-control" role="button">Search</button>
+	 <div class="form-group">
+	   <label>Case sensitive:</label>
+	   <div class="checkbox">
+	     <input type="checkbox" class="form-control" value="case-sensitive" id="case" name="case" checked="checked" />
+	   </div>
+	 </div>
+	 <div class="form-group">
+	   <label for="topn">Hits per page</label>
+	   <select class="form-control" id="hits_per_page" name="hits_per_page">
+	     <option>10</option>
+	     <option selected>50</option>
+	     <option>100</option>
+	     <option>250</option>
+	     <option>1000</option>
+	   </select>
+	 </div>
+     </form>
+     <a href="" id="querylink">[Link to this query]</a> <a href="" id="downloadlink">[Download data]</a> <a href="http://bionlp.utu.fi/searchexpressions-new.html">[Query Language]</a>
+     <div id="loading" style="display:none">
+       <p><img src="{{url_for('static' , filename='wait.gif')}}" /> </p>
+     </div>
+     <div id="queryresult" class="row" ></div>
+
+<!-- annotation visualization stuff --> 
+<script type="text/javascript">
+    var root = "{{url_for('static' , filename='')}}";
+    head.js(
+        // External libraries
+        root + 'js/jquery.min.js',
+        root + 'js/jquery.svg.min.js',
+        root + 'js/jquery.svgdom.min.js',
+        root + 'js/jquery-ui.min.js',
+        root + 'js/waypoints.min.js',
+        // brat helper modules
+        root + 'js/brat/configuration.js',
+        root + 'js/brat/util.js',
+        root + 'js/brat/annotation_log.js',
+        root + 'js/webfont.js',
+        // brat main modules
+        root + 'js/brat/dispatcher.js',
+        root + 'js/brat/url_monitor.js',
+        root + 'js/brat/visualizer.js',
+        // external parsing libraries
+        root + 'js/conllu.js/conllu.js',
+        // annotation documentation support
+        root + 'js/local/annodoc.js',
+        // project-specific collection data
+        root + 'js/local/collections.js',
+        // project-specific configuration
+        root + 'js/local/config.js'
+    );
+
+    var webFontURLs = [
+        root + 'fonts/PT_Sans-Caption-Web-Regular.ttf',
+        root + 'fonts/Liberation_Sans-Regular.ttf'
+    ];
+
+    head.ready(function() {
+        // mark current collection (filled in by Jekyll)
+        Collections.listing['_current'] = ';'
+
+	// performs all embedding and support functions
+    console.log("Activating Annodoc");
+    Annodoc.activate(Config.bratCollData, Collections.listing);
+    console.log("Done activating Annodoc");
+    });
+</script>
+<!-- end annotation visualization stuff -->
+
+{% if run_request is defined %}
+<script type="text/javascript">
+  {{run_request}};
+</script>
+{% endif %}
+
+ </body>
+ </html>

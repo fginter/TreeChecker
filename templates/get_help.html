@@ -1,0 +1,25 @@
+<html>
+  <body>
+    <h1>/query</h1>
+    <p>This is an interface allowing direct links to the dep_search web user interface.</p>
+    <ul>
+      <li> <b>db</b> : a tree database to query (see the currently available list below). Compulsory parameter.</li>
+      <li> <b>search</b> : the query to run</li>
+      <li> <b>case</b> : case-sensitive "true" or "false"</li>
+      <li> <b>max_hits</b> : how many hits to show? 10, 50, 100, 250 are possible values</li>
+    </ul>
+
+    <h1>Available tree databases</h1>
+    {% for cgroup in corpus_groups %}
+    <h2>{{cgroup.name}}</h2>
+    <table>
+      <tr><th>tree database id</th><th>name</th></tr>
+      {% for cid, cname in cgroup.corpora %}
+      <tr><td><b>{{cid}}</b></td><td>{{cname}}</td></tr>
+      {% endfor %}
+    </table>
+    {% endfor %}
+  </body>
+
+  
+</html>
