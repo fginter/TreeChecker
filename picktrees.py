@@ -40,22 +40,22 @@ l=jinja2.FileSystemLoader("templates")
 it=l.load(jinja2.Environment(),"index_template.html")
 lt=l.load(jinja2.Environment(),"list_template.html")
 
-def print_block(fname,block_trees,left,right,random_sample=False):
+def print_block(rnd_idx,fname,block_trees,left,right,args,random_sample=False):
     # prints a block and return info needed in index page
 
     sorted_trees=sorted(block_trees.items(),key=lambda itm: len(itm[1]))
 
-    if random_sample:
-        limited_trees=[]
-        for dtype,all_trees in sorted_trees:
-            limited_trees.append((dtype,random.sample(all_trees,min(10,len(all_trees)))))
-        sorted_trees=limited_trees
+    # if random_sample:
+    limited_trees=[]
+    for dtype,all_trees in sorted_trees:
+        limited_trees.append((dtype,random.sample(all_trees,min(args.max_trees,len(all_trees)))))
+    sorted_trees=limited_trees
     
 
     with open(fname+".conllu","wt") as f: # this just prints dtype...
         print(u"\n".join(dtype for dtype,v in sorted_trees),file=f)
 
-    html=it.render(trees=sorted_trees,title=fname)
+    html=it.render(trees=sorted_trees,title=fname,collection=args.collection)
     with open(fname+".html","wt") as f:
         print(html,file=f)
 
@@ -71,10 +71,10 @@ def print_block(fname,block_trees,left,right,random_sample=False):
     if len(types)>30:
         types=types[:27]+"..."
         
-    return ((total,typecount,types,left,right),link)
+    return ((rnd_idx,total,typecount,types,left,right),link)
 
 
-def print_trees(inp,line2treeidx,trees,random_sample=False):
+def print_trees(inp,line2treeidx,trees,args,random_sample=False):
 
     files=[] # total, typecount, types, left, right, link
     
@@ -132,12 +132,13 @@ def print_trees(inp,line2treeidx,trees,random_sample=False):
             tree_counter=0
 
     # now we have all blocks, take random sample, or print all
-    if random_sample:
-        my_sample=random.sample(all_blocks,min(100,len(all_blocks)))
-    else:
-        my_sample=all_blocks
-    for (fname,block_trees,left,right) in my_sample:
-        index_info=print_block(fname,block_trees,left,right,random_sample=random_sample)
+    # if random_sample:
+    #     my_sample=random.sample(all_blocks,min(100,len(all_blocks)))
+    # else:
+    #     my_sample=all_blocks
+    random.shuffle(all_blocks)
+    for rnd_idx,(fname,block_trees,left,right) in enumerate(all_blocks):
+        index_info=print_block(rnd_idx,fname,block_trees,left,right,args,random_sample=random_sample)
         files.append(index_info)
 
     with open(args.out+"/index.html","wt") as f:
@@ -150,22 +151,24 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='gizmo')
     parser.add_argument('--conllu', required=True, help='Input conllu')
     parser.add_argument('--ctx', required=True, help='Input contexts')
+    parser.add_argument('--collection', required=True, help='Collection name for flask_shelve')
     parser.add_argument('--out', required=True, help='outdir')
     parser.add_argument('--random', action='store_true', default=False, help='Take random sample')
+    parser.add_argument('--max-trees', default=50, type=int, help='Maximum number of trees per dependency type shown on the page')
     
     args = parser.parse_args()
 
     os.system("mkdir -p "+args.out)
 #    os.system("cp -r js css fonts "+args.out)
     os.system("cp -r static "+args.out)
-    os.system("cp flask_shelve.js "+args.out)
+#    os.system("cp flask_shelve.js "+args.out)
 
     line2treeidx={}
     trees=list(read_conll(open(args.conllu)))
     for treeidx,(tree,comments) in enumerate(trees):
         for cols in tree:
             line2treeidx[cols[-1]]=treeidx
-    print_trees(open(args.ctx),line2treeidx,trees,random_sample=args.random)
+    print_trees(open(args.ctx),line2treeidx,trees,args,random_sample=args.random)
 
 
 

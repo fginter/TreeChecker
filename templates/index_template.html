@@ -16,7 +16,7 @@
      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
      <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.min.js"></script>
      <!-- <script type="text/javascript" src="js/head.min.js"></script> -->
-     <script type="text/javascript" src="flask_shelve.js"></script>
+     <script type="text/javascript" src="static/js/flask_shelve.js"></script>
 
       <link rel="stylesheet" href="static/css/annodoc-main.css"/>
       <link rel="stylesheet" href="static/css/style-vis.css"/> 
@@ -37,7 +37,7 @@
 {{tree}}
 </pre>
 </div> -->
-<div class="flask_shelve" fstype="multichoice" fschoices="Correct|WrongType|WrongDep|WrongTagOrLemma" fscol="udconsistency" fsid="{{ treeid }}" fsmeta="{{ treemeta }}">
+<div class="flask_shelve" fstype="multichoice" fschoices="Correct|WrongType|WrongDep|WrongTagOrLemma|Other" fscol="{{collection}}" fsid="{{ treeid }}" fsmeta="{{ treemeta }}">
 <pre>
 <code class="conllu">
 {{tree}}
@@ -97,7 +97,7 @@
 <script type="text/javascript">
   APP_ROOT="http://epsilon-it.utu.fi/flask_shelve";
   $(".flask_shelve").each(flask_shelve);
-  initialize_values("udconsistency");
+  initialize_values("{{collection}}");
 </script>
  </body>
  </html>

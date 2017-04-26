@@ -27,9 +27,10 @@
  </head>
  
  <body>
-   <table id="files">
+   <table class="hover stripe nowrap compact order-column" id="files">
         <thead>
-            <tr>
+          <tr>
+	        <th>SampleIdx</th>
                 <th>Total</th>
                 <th>TypeCnt</th>
                 <th>Types</th>
@@ -39,7 +40,8 @@
             </tr>
         </thead>
         <tfoot>
-            <tr>
+          <tr>
+	        <th>SampleIdx</th>
                 <th>Total</th>
                 <th>TypeCnt</th>
                 <th>Types</th>
@@ -62,7 +64,7 @@
 
    <script type="text/javascript">
      $(document).ready(function() {
-    $('#files').DataTable({"order": [[ 0, "desc" ]], "paging":false});
+    $('#files').DataTable({"order": [[ 0, "asc" ]], "paging":false, "columnDefs": [{"className": "dt-center", "targets":"_all"}]});
      } );
    </script>
  </body>
