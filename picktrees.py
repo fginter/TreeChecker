@@ -120,7 +120,7 @@ def print_trees(inp,line2treeidx,trees,random_sample=False):
                     "\n".join("\t".join(cols[:-1]) for cols in tree),""))
             tree_id=fname.split("/")[-1]+"_"+str(tree_counter)
             # TODO: add here necessary metadata
-            tree_meta="gov_form:{g}, dep_form:{d}, deprel:{dtype}".format(g=tree[gov][FORM],d=tree[dep][FORM],dtype=tree[dep][DEPREL])
+            tree_meta="gov_form:{g}, dep_form:{d}, deprel:{dtype}, left:{l}, right:{r}".format(g=tree[gov][FORM],d=tree[dep][FORM],dtype=tree[dep][DEPREL],l=left.replace('"',''),r=right.replace('"',''))
             block_trees.setdefault(dtype,[]).append((conllu,tree_id,tree_meta))
             tree_counter+=1
             
