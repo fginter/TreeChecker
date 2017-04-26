@@ -1,6 +1,7 @@
 import os
 import sys
 import jinja2
+import random
 
 
 def read_conll(inp,maxsent=0):
@@ -39,35 +40,51 @@ l=jinja2.FileSystemLoader("templates")
 it=l.load(jinja2.Environment(),"index_template.html")
 lt=l.load(jinja2.Environment(),"list_template.html")
 
+def print_block(fname,block_trees,left,right,random_sample=False):
+    # prints a block and return info needed in index page
+
+    sorted_trees=sorted(block_trees.items(),key=lambda itm: len(itm[1]))
+
+    if random_sample:
+        limited_trees=[]
+        for dtype,all_trees in sorted_trees:
+            limited_trees.append((dtype,random.sample(all_trees,min(10,len(all_trees)))))
+        sorted_trees=limited_trees
+    
+
+    with open(fname+".conllu","wt") as f: # this just prints dtype...
+        print(u"\n".join(dtype for dtype,v in sorted_trees),file=f)
+
+    html=it.render(trees=sorted_trees,title=fname)
+    with open(fname+".html","wt") as f:
+        print(html,file=f)
+
+    # index page
+    total=sum(len(v) for dtype,v in sorted_trees)
+    typecount=len(sorted_trees)
+    types=", ".join(sorted(dtype for dtype,v in sorted_trees))
+    link=os.path.basename(fname+".html")
+    if len(left)>15:
+        left=left[:12]+"..."
+    if len(right)>15:
+        right=right[:12]+"..."
+    if len(types)>30:
+        types=types[:27]+"..."
+        
+    return ((total,typecount,types,left,right),link)
 
 
-def print_trees(inp,line2treeidx,trees):
+def print_trees(inp,line2treeidx,trees,random_sample=False):
 
     files=[] # total, typecount, types, left, right, link
     
     tree_counter=0
+    all_blocks=[]
     for line in inp:
         line=line.rstrip()
-        if not line:
-            with open(fname+".conllu","wt") as f:
-                print(u"\n".join(block_trees),file=f)
-            sorted_trees=sorted(block_trees.items(),key=lambda itm: len(itm[1]))
-            html=it.render(trees=sorted_trees,title=fname)
-            with open(fname+".html","wt") as f:
-                print(html,file=f)
-
-            total=sum(len(v) for v in block_trees.values())
-            typecount=len(block_trees)
-            types=", ".join(sorted(block_trees.keys()))
-            link=os.path.basename(fname+".html")
-            if len(left)>15:
-                left=left[:12]+"..."
-            if len(right)>15:
-                right=right[:12]+"..."
-            if len(types)>30:
-                types=types[:27]+"..."
-        
-            files.append(((total,typecount,types,left,right),link))
+        if not line: # store last block
+            # fname, block_trees
+            all_blocks.append((fname,block_trees,left,right))
             
         elif line[0].isspace():
             #context | L, xcomp:ds with (ylennettiin, ylipäälliköksi) at (190794, 190800)
@@ -96,11 +113,15 @@ def print_trees(inp,line2treeidx,trees):
                 print("\n".join("\t".join(str(c) for c in cols) for cols in tree))
                 print()
                 print()
+            # # visual-style 24 16 advmod     color:gray
             conllu="\n".join(("# "+line,"# visual-style\t{}\tbgColor:red".format(tree[gov][ID]),\
                   "# visual-style\t{}\tbgColor:red".format(tree[dep][ID]),\
+                    "# visual-style\t{} {} {}\tcolor:red".format(tree[gov][ID],tree[dep][ID],tree[dep][DEPREL]),\
                     "\n".join("\t".join(cols[:-1]) for cols in tree),""))
             tree_id=fname.split("/")[-1]+"_"+str(tree_counter)
-            block_trees.setdefault(dtype,[]).append((conllu,tree_id))
+            # TODO: add here necessary metadata
+            tree_meta="gov_form:{g}, dep_form:{d}, deprel:{dtype}".format(g=tree[gov][FORM],d=tree[dep][FORM],dtype=tree[dep][DEPREL])
+            block_trees.setdefault(dtype,[]).append((conllu,tree_id,tree_meta))
             tree_counter+=1
             
         else:
@@ -109,6 +130,16 @@ def print_trees(inp,line2treeidx,trees):
             fname=args.out+"/"+nre.sub("_",line.replace(", ","------"))
             block_trees={} #dtype -> trees
             tree_counter=0
+
+    # now we have all blocks, take random sample, or print all
+    if random_sample:
+        my_sample=random.sample(all_blocks,min(100,len(all_blocks)))
+    else:
+        my_sample=all_blocks
+    for (fname,block_trees,left,right) in my_sample:
+        index_info=print_block(fname,block_trees,left,right,random_sample=random_sample)
+        files.append(index_info)
+
     with open(args.out+"/index.html","wt") as f:
         print(lt.render(files=files),file=f)
         
@@ -120,6 +151,7 @@ if __name__=="__main__":
     parser.add_argument('--conllu', required=True, help='Input conllu')
     parser.add_argument('--ctx', required=True, help='Input contexts')
     parser.add_argument('--out', required=True, help='outdir')
+    parser.add_argument('--random', action='store_true', default=False, help='Take random sample')
     
     args = parser.parse_args()
 
@@ -133,7 +165,7 @@ if __name__=="__main__":
     for treeidx,(tree,comments) in enumerate(trees):
         for cols in tree:
             line2treeidx[cols[-1]]=treeidx
-    print_trees(open(args.ctx),line2treeidx,trees)
+    print_trees(open(args.ctx),line2treeidx,trees,random_sample=args.random)
 
 
 

@@ -7,7 +7,7 @@
      <meta name="description" content="">
      <meta name="author" content="">
  
-     <title>Test</title>
+     <title>{{ title }}</title>
 
 
      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
@@ -30,14 +30,14 @@
 {% for dtype, treelist in trees %}
 <h2 style="text-align: center" class="content-head ui-widget-header">{{ dtype }}</h2>
 <div class="container">
-{% for tree,treeid in treelist %}
+{% for tree,treeid,treemeta in treelist %}
 <!-- <a data-target="#conllu_{{loop.index}}" data-toggle="collapse"> [conllu]</a>
 <div class="collapse" id="conllu_{{loop.index}}">
 <pre>
 {{tree}}
 </pre>
 </div> -->
-<div class="flask_shelve" fstype="multichoice" fschoices="Correct|WrongType|WrongDep" fscol="udconsistency" fsid="{{treeid}}">
+<div class="flask_shelve" fstype="multichoice" fschoices="Correct|WrongType|WrongDep" fscol="udconsistency" fsid="{{ treeid }}" fsmeta="{{ treemeta }}">
 <pre>
 <code class="conllu">
 {{tree}}
